@@ -1,0 +1,248 @@
+﻿@model IEnumerable<myShop.BLL.DTOS.UserDTO>
+
+@{
+    ViewBag.PageTitle = "Users Management";
+    ViewBag.CardTitle = "View Users";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+
+<style>
+
+    .custom-card {
+        background: rgba(255,255,255,.75);
+        backdrop-filter: blur(12px);
+        border-radius: 18px;
+        border: 1px solid rgba(160,173,186,.35);
+        box-shadow: 0 15px 35px rgba(0,0,0,.12);
+        padding: 28px;
+        animation: fadeIn .4s ease;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(8px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .custom-card-title {
+        background: linear-gradient(135deg,#1e3a8a,#3b82f6);
+        padding: 18px;
+        border-radius: 14px;
+        margin-bottom: 22px;
+        text-align: center;
+        color: white;
+        font-weight: 700;
+        letter-spacing: .6px;
+        font-size: 22px;
+        box-shadow: 0 4px 20px rgba(30,58,138,.35);
+    }
+
+    #usersTable thead th {
+        background: #1e40af;
+        color: white;
+        padding: 14px;
+    }
+
+    #usersTable tbody td {
+        padding: 14px;
+        vertical-align: middle;
+        color: #1e3a8a;
+    }
+
+    #usersTable tbody tr:hover {
+        background: #eef4ff;
+    }
+
+    .badge-role {
+        padding: 7px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .badge-admin {
+        background: #0d6efd;
+        color: white;
+    }
+
+    .badge-customer {
+        background: #6c757d;
+        color: white;
+    }
+
+    .badge-active {
+        background: #198754;
+        color: white;
+    }
+
+    .badge-locked {
+        background: #dc3545;
+        color: white;
+    }
+
+    .action-btn {
+        border-radius: 8px;
+        padding: 7px 13px;
+        margin-right: 4px;
+    }
+
+</style>
+
+<div class="custom-card">
+
+    <div class="custom-card-title">
+        <i class="fas fa-users me-2"></i>
+        Users List
+    </div>
+
+    <table id="usersTable" class="display table table-hover w-100">
+
+        <thead>
+
+            <tr>
+
+                <th>Username</th>
+                <th>Email</th>
+                <th>Current Role</th>
+                <th>Lock Status</th>
+                <th width="170">Actions</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            @foreach (var user in Model)
+            {
+                <tr>
+
+                    <td>
+                        <i class="fas fa-user-circle text-primary me-2"></i>
+                        @user.UserName
+                    </td>
+
+                    <td>@user.Email</td>
+
+                    <td>
+
+                        @if (user.CurrentRole == "Admin")
+                        {
+                            <span class="badge-role badge-admin">
+                                <i class="fas fa-user-shield"></i>
+                                Admin
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge-role badge-customer">
+                                <i class="fas fa-user"></i>
+                                Customer
+                            </span>
+                        }
+
+                    </td>
+
+                    <td>
+
+                        @if (user.IsLocked)
+                        {
+                            <span class="badge-role badge-locked">
+                                <i class="fas fa-lock"></i>
+                                Locked
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge-role badge-active">
+                                <i class="fas fa-check-circle"></i>
+                                Active
+                            </span>
+                        }
+
+                    </td>
+
+                    <td>
+
+                        @if (user.IsLocked)
+                        {
+                            <form asp-action="UnlockUser" method="post" style="display:inline;">
+                                <input type="hidden" name="userId" value="@user.Id" />
+                                @Html.AntiForgeryToken()
+
+                                <button type="submit"
+                                        class="btn btn-success btn-sm action-btn"
+                                        title="Unlock">
+                                    <i class="fas fa-lock-open"></i>
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form asp-action="LockUser" method="post" style="display:inline;">
+                                <input type="hidden" name="userId" value="@user.Id" />
+                                @Html.AntiForgeryToken()
+
+                                <button type="submit"
+                                        class="btn btn-warning btn-sm action-btn"
+                                        title="Lock">
+                                    <i class="fas fa-lock"></i>
+                                </button>
+                            </form>
+                        }
+
+                        <form asp-action="DeleteUser"
+                              method="post"
+                              style="display:inline;">
+
+                            <input type="hidden" name="userId" value="@user.Id" />
+
+                            @Html.AntiForgeryToken()
+
+                            <button type="submit"
+                                    class="btn btn-danger btn-sm action-btn"
+                                    title="Delete">
+
+                                <i class="fas fa-trash"></i>
+
+                            </button>
+
+                        </form>
+
+                    </td>
+
+                </tr>
+            }
+
+        </tbody>
+
+    </table>
+
+</div>
+
+@section Scripts {
+
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <script>
+
+        $(document).ready(function () {
+
+            $("#usersTable").DataTable({
+                responsive: true
+            });
+
+        });
+
+    </script>
+
+}

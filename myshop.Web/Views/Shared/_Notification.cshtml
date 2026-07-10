@@ -1,0 +1,26 @@
+﻿@if (TempData["Create"] != null)
+{
+    <div id="Alert" class="alert alert-success text-center alert-dismissible fade show">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        @TempData["Create"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["Update"] != null)
+{
+    <div id="Alert" class="alert alert-warning text-center alert-dismissible fade show">
+        <i class="bi bi-pencil-square me-2"></i>
+        @TempData["Update"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["Delete"] != null)
+{
+    <div id="Alert" class="alert alert-danger text-center alert-dismissible fade show">
+        <i class="bi bi-trash-fill me-2"></i>
+        @TempData["Delete"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
