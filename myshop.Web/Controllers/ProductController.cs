@@ -124,7 +124,7 @@ namespace myshop.Web.Areas.Admin.Controllers
                 return RedirectToAction("Index");
         }
         
-        [HttpDelete]
+        [HttpPost]
         [Authorize(Policy = "OnlyAdmin")]
         public async Task<IActionResult> Delete(int id)
         {

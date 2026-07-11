@@ -28,6 +28,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromDays(4);
     options.User.RequireUniqueEmail = true;
+    //options.SignIn.RequireConfirmedEmail = true;
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
@@ -55,6 +56,7 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddAutoMapper(typeof(MappingReference).Assembly);
 builder.Services.AddScoped<ICategoryService , CategoryService>();
 builder.Services.AddScoped<IUserService, UserService>();
+
 
 
 var app = builder.Build();

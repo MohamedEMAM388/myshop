@@ -1,4 +1,4 @@
-﻿@model IEnumerable<myShop.BLL.DTOS.UserDTO>
+﻿@model myShop.BLL.PaginatedList
 
 @{
     ViewBag.PageTitle = "Users Management";
@@ -7,17 +7,15 @@
 }
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
 
 <style>
 
     .custom-card {
-        background: rgba(255,255,255,.75);
-        backdrop-filter: blur(12px);
-        border-radius: 18px;
-        border: 1px solid rgba(160,173,186,.35);
-        box-shadow: 0 15px 35px rgba(0,0,0,.12);
-        padding: 28px;
+        background: #fff;
+        border-radius: 22px;
+        overflow: hidden;
+        border: none;
+        box-shadow: 0 12px 35px rgba(0,0,0,.08);
         animation: fadeIn .4s ease;
     }
 
@@ -34,65 +32,201 @@
     }
 
     .custom-card-title {
-        background: linear-gradient(135deg,#1e3a8a,#3b82f6);
-        padding: 18px;
-        border-radius: 14px;
-        margin-bottom: 22px;
-        text-align: center;
+        background: linear-gradient(135deg,#1e3c72,#2a5298);
         color: white;
+        padding: 22px 30px;
+        font-size: 24px;
         font-weight: 700;
-        letter-spacing: .6px;
-        font-size: 22px;
-        box-shadow: 0 4px 20px rgba(30,58,138,.35);
+        letter-spacing: .5px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
     }
 
-    #usersTable thead th {
-        background: #1e40af;
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    #usersTable {
+        margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+        #usersTable thead th {
+            background: #2848b8;
+            color: white;
+            border: none;
+            padding: 18px;
+            font-size: 15px;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        #usersTable tbody tr {
+            transition: .25s ease;
+        }
+
+            #usersTable tbody tr:nth-child(even) {
+                background: #fafcff;
+            }
+
+            #usersTable tbody tr:hover {
+                background: #eef5ff;
+                transform: translateY(-2px);
+                box-shadow: 0 8px 20px rgba(0,0,0,.05);
+            }
+
+        #usersTable tbody td {
+            padding: 20px 18px;
+            vertical-align: middle;
+            border-top: 1px solid #edf2f7;
+            font-size: 15px;
+            color: #233876;
+        }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .user-avatar {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        background: linear-gradient(135deg,#4f8cff,#2856d8);
         color: white;
-        padding: 14px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 18px;
+        transition: .3s;
+        box-shadow: 0 6px 15px rgba(79,140,255,.35);
     }
 
-    #usersTable tbody td {
-        padding: 14px;
-        vertical-align: middle;
-        color: #1e3a8a;
-    }
+        .user-avatar:hover {
+            transform: scale(1.08) rotate(8deg);
+        }
 
-    #usersTable tbody tr:hover {
-        background: #eef4ff;
+    .user-info strong {
+        font-size: 15px;
+        color: #233876;
     }
 
     .badge-role {
-        padding: 7px 14px;
-        border-radius: 20px;
+        padding: 9px 18px;
+        border-radius: 30px;
         font-size: 13px;
         font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: white;
+        transition: .25s;
     }
 
+        .badge-role:hover {
+            transform: scale(1.05);
+        }
+
     .badge-admin {
-        background: #0d6efd;
-        color: white;
+        background: linear-gradient(135deg,#0d6efd,#3d8bfd);
     }
 
     .badge-customer {
-        background: #6c757d;
-        color: white;
+        background: linear-gradient(135deg,#6c757d,#868e96);
     }
 
     .badge-active {
-        background: #198754;
-        color: white;
+        background: linear-gradient(135deg,#16a34a,#22c55e);
     }
 
     .badge-locked {
-        background: #dc3545;
-        color: white;
+        background: linear-gradient(135deg,#dc3545,#ef4444);
     }
 
     .action-btn {
-        border-radius: 8px;
-        padding: 7px 13px;
-        margin-right: 4px;
+        width: 42px;
+        height: 42px;
+        border: none;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin: 2px;
+        transition: .25s;
+        box-shadow: 0 5px 12px rgba(0,0,0,.12);
+    }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 18px rgba(0,0,0,.18);
+        }
+
+    .btn-success:hover,
+    .btn-warning:hover,
+    .btn-primary:hover,
+    .btn-secondary:hover,
+    .btn-danger:hover {
+        filter: brightness(1.08);
+    }
+
+    .actions {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: nowrap;
+        gap: 6px;
+    }
+
+    .pagination {
+        margin-top: 30px;
+    }
+
+        .pagination .page-link {
+            width: 42px;
+            height: 42px;
+            border: none;
+            border-radius: 12px;
+            margin: 0 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2848b8;
+            font-weight: 600;
+            transition: .25s;
+        }
+
+            .pagination .page-link:hover {
+                background: #2848b8;
+                color: white;
+            }
+
+        .pagination .active .page-link {
+            background: #2848b8;
+            color: white;
+            box-shadow: 0 6px 15px rgba(40,72,184,.35);
+        }
+
+    @@media(max-width:768px) {
+
+        .custom-card-title {
+            font-size: 20px;
+            padding: 18px;
+        }
+
+        #usersTable th,
+        #usersTable td {
+            white-space: nowrap;
+        }
+
+        .action-btn {
+            width: 38px;
+            height: 38px;
+        }
     }
 
 </style>
@@ -100,149 +234,226 @@
 <div class="custom-card">
 
     <div class="custom-card-title">
-        <i class="fas fa-users me-2"></i>
-        Users List
+        <i class="fas fa-users"></i>
+        <span>Users Management</span>
     </div>
 
-    <table id="usersTable" class="display table table-hover w-100">
+    <div class="table-responsive">
 
-        <thead>
+        <table id="usersTable" class="table align-middle mb-0">
 
-            <tr>
-
-                <th>Username</th>
-                <th>Email</th>
-                <th>Current Role</th>
-                <th>Lock Status</th>
-                <th width="170">Actions</th>
-
-            </tr>
-
-        </thead>
-
-        <tbody>
-
-            @foreach (var user in Model)
-            {
+            <thead>
                 <tr>
-
-                    <td>
-                        <i class="fas fa-user-circle text-primary me-2"></i>
-                        @user.UserName
-                    </td>
-
-                    <td>@user.Email</td>
-
-                    <td>
-
-                        @if (user.CurrentRole == "Admin")
-                        {
-                            <span class="badge-role badge-admin">
-                                <i class="fas fa-user-shield"></i>
-                                Admin
-                            </span>
-                        }
-                        else
-                        {
-                            <span class="badge-role badge-customer">
-                                <i class="fas fa-user"></i>
-                                Customer
-                            </span>
-                        }
-
-                    </td>
-
-                    <td>
-
-                        @if (user.IsLocked)
-                        {
-                            <span class="badge-role badge-locked">
-                                <i class="fas fa-lock"></i>
-                                Locked
-                            </span>
-                        }
-                        else
-                        {
-                            <span class="badge-role badge-active">
-                                <i class="fas fa-check-circle"></i>
-                                Active
-                            </span>
-                        }
-
-                    </td>
-
-                    <td>
-
-                        @if (user.IsLocked)
-                        {
-                            <form asp-action="UnlockUser" method="post" style="display:inline;">
-                                <input type="hidden" name="userId" value="@user.Id" />
-                                @Html.AntiForgeryToken()
-
-                                <button type="submit"
-                                        class="btn btn-success btn-sm action-btn"
-                                        title="Unlock">
-                                    <i class="fas fa-lock-open"></i>
-                                </button>
-                            </form>
-                        }
-                        else
-                        {
-                            <form asp-action="LockUser" method="post" style="display:inline;">
-                                <input type="hidden" name="userId" value="@user.Id" />
-                                @Html.AntiForgeryToken()
-
-                                <button type="submit"
-                                        class="btn btn-warning btn-sm action-btn"
-                                        title="Lock">
-                                    <i class="fas fa-lock"></i>
-                                </button>
-                            </form>
-                        }
-
-                        <form asp-action="DeleteUser"
-                              method="post"
-                              style="display:inline;">
-
-                            <input type="hidden" name="userId" value="@user.Id" />
-
-                            @Html.AntiForgeryToken()
-
-                            <button type="submit"
-                                    class="btn btn-danger btn-sm action-btn"
-                                    title="Delete">
-
-                                <i class="fas fa-trash"></i>
-
-                            </button>
-
-                        </form>
-
-                    </td>
-
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Current Role</th>
+                    <th>Lock Status</th>
+                    <th class="text-center" width="220">Actions</th>
                 </tr>
-            }
+            </thead>
 
-        </tbody>
+            <tbody>
 
-    </table>
+                @foreach (var user in Model.Items)
+                {
+                    <tr>
+
+                        <td>
+
+                            <div class="user-info">
+
+                                <div class="user-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+
+                                <div>
+                                    <strong>@user.UserName</strong>
+                                </div>
+
+                            </div>
+
+                        </td>
+
+                        <td>@user.Email</td>
+
+                        <td>
+
+                            @if (user.CurrentRole == "Admin")
+                            {
+                                <span class="badge-role badge-admin">
+                                    <i class="fas fa-user-shield"></i>
+                                    Admin
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge-role badge-customer">
+                                    <i class="fas fa-user"></i>
+                                    Customer
+                                </span>
+                            }
+
+                        </td>
+
+                        <td>
+
+                            @if (user.IsLocked)
+                            {
+                                <span class="badge-role badge-locked">
+                                    <i class="fas fa-lock"></i>
+                                    Locked
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge-role badge-active">
+                                    <i class="fas fa-check-circle"></i>
+                                    Active
+                                </span>
+                            }
+
+                        </td>
+
+                        <td>
+
+                            <div class="actions">
+
+                                @if (user.IsLocked)
+                                {
+                                    <form asp-action="UnlockUser" method="post">
+
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="userId" value="@user.Id" />
+
+                                        <button type="submit"
+                                                class="btn btn-success btn-sm action-btn"
+                                                title="Unlock User">
+                                            <i class="fas fa-lock-open"></i>
+                                        </button>
+
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form asp-action="LockUser" method="post">
+
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="userId" value="@user.Id" />
+
+                                        <button type="submit"
+                                                class="btn btn-warning btn-sm action-btn"
+                                                title="Lock User">
+                                            <i class="fas fa-lock"></i>
+                                        </button>
+
+                                    </form>
+                                }
+
+                                @if (user.CurrentRole == "Customer")
+                                {
+                                    <form asp-action="PromoteToAdmin" method="post">
+
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="userId" value="@user.Id" />
+
+                                        <button type="submit"
+                                                class="btn btn-primary btn-sm action-btn"
+                                                title="Promote To Admin">
+                                            <i class="fas fa-user-shield"></i>
+                                        </button>
+
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form asp-action="DemoteToCustomer" method="post">
+
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="userId" value="@user.Id" />
+
+                                        <button type="submit"
+                                                class="btn btn-secondary btn-sm action-btn"
+                                                title="Demote To Customer">
+                                            <i class="fas fa-user-minus"></i>
+                                        </button>
+
+                                    </form>
+                                }
+
+                                <form asp-action="DeleteUser" method="post">
+
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="userId" value="@user.Id" />
+
+                                    <button type="submit"
+                                            class="btn btn-danger btn-sm action-btn"
+                                            title="Delete User">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <nav class="mt-4">
+
+            <ul class="pagination justify-content-center">
+
+                @if (Model.HasPrevious)
+                {
+                    <li class="page-item">
+
+                        <a asp-action="Index"
+                           asp-route-page="@(Model.CurrentPage - 1)"
+                           class="page-link">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+
+                    </li>
+                }
+
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+
+                        <a asp-action="Index"
+                           asp-route-page="@i"
+                           class="page-link">
+                            @i
+                        </a>
+
+                    </li>
+                }
+
+                @if (Model.HasNext)
+                {
+                    <li class="page-item">
+
+                        <a asp-action="Index"
+                           asp-route-page="@(Model.CurrentPage + 1)"
+                           class="page-link">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+
+                    </li>
+                }
+
+            </ul>
+
+        </nav>
+    }
 
 </div>
-
-@section Scripts {
-
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-
-    <script>
-
-        $(document).ready(function () {
-
-            $("#usersTable").DataTable({
-                responsive: true
-            });
-
-        });
-
-    </script>
-
-}

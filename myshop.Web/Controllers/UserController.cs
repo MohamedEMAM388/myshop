@@ -18,10 +18,13 @@ namespace myshop.PL.Controllers
             _userService = userService;
             _userManager = userManager;
         }
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
-            var users = await _userService.GetAllUsersAsync();
-            return View(users);
+            const int pageSize = 5;
+
+            var result = await _userService.GetAllUsersAsync(page, pageSize);
+
+            return View(result);
         }
 
         // GET: User/PromoteToAdmin/5

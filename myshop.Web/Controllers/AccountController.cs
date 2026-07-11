@@ -84,6 +84,7 @@ namespace myshop.PL.Controllers
 
             if (result.Succeeded) {
 
+
                 await _userManager.AddToRoleAsync(usre, "Customer");
                 // redirect to login page 
                 return RedirectToAction(nameof(Login));

@@ -27,27 +27,44 @@ namespace myShop.BLL.Services.Classes
 
 
 
-        public async Task<IEnumerable<UserDTO>> GetAllUsersAsync()
+        public async Task<PaginatedList> GetAllUsersAsync(int page, int pageSize)
         {
-            var users = await _userManager.Users.ToListAsync();
-            var userDtos = new List<UserDTO>();
+            var query = _userManager.Users;
+
+            var totalCount = await query.CountAsync();
+
+            // apply pagination
+            var users = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            // create a list of UserDTOs to return
+            var result = new List<UserDTO>();
 
             foreach (var user in users)
             {
                 var roles = await _userManager.GetRolesAsync(user);
 
-                userDtos.Add(new UserDTO
+                result.Add(new UserDTO
                 {
                     Id = user.Id,
                     UserName = user.UserName!,
                     Email = user.Email!,
-                    CurrentRole = roles.FirstOrDefault() ?? "No Role",
-                    IsLocked = user.LockoutEnd.HasValue &&
-                               user.LockoutEnd.Value > DateTimeOffset.UtcNow
+                    CurrentRole = roles.FirstOrDefault() ?? "Customer",
+                    IsLocked = user.LockoutEnd > DateTimeOffset.UtcNow
                 });
             }
 
-            return userDtos;
+            // return a PaginatedList object containing the results
+            return new PaginatedList
+            {
+                Items = result,
+                CurrentPage = page,
+                PageSize = pageSize,
+                TotalCount = totalCount,
+                TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize)
+            };
         }
 
         public async Task<bool> PromoteToAdminAsync(string userId)
@@ -141,5 +158,7 @@ namespace myShop.BLL.Services.Classes
             var unlockAccount = await _userManager.SetLockoutEndDateAsync(user,null);
             return unlockAccount.Succeeded;
         }
+
+
     }
 }
