@@ -18,7 +18,10 @@ namespace myShop.BLL.Mapping
             CreateMap<Product, ProductListDTO>()
                              .ForMember(dst => dst.CategoryName,
                              opt => opt.MapFrom(src => src.Category.Name));
-                    
+
+            CreateMap<Product, Product>()
+                           .ForMember(dest => dest.Img, opt => opt.Ignore());
+
         }
     }
 }

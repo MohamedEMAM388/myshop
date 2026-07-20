@@ -20,13 +20,13 @@ namespace myShop.BLL.Services.Interfaces
         Task<IEnumerable<SelectListItem>> GetCategoriesAsync();
 
         // Create a new product
-        Task<bool> CreateAsync(ProductVM productVM, IFormFile file);
+        Task<bool> CreateAsync(ProductVM productVM);
 
         // get a product by id
         Task<Product?> GetByIdAsync(int id);
 
         // Update an existing product
-        Task<bool> UpdateAsync(ProductVM productVM, IFormFile? file);
+        Task<bool> UpdateAsync(ProductVM productVM);
 
         // Delete a product by id
         Task<bool> DeleteAsync(int id);

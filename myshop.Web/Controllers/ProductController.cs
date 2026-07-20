@@ -53,17 +53,26 @@ namespace myshop.Web.Areas.Admin.Controllers
 
         [HttpPost]
         [Authorize(Policy = "OnlyAdmin")]
-        public async Task<IActionResult> Create(ProductVM productVM,IFormFile file)
+        public async Task<IActionResult> Create(ProductVM productVM)
         {
 
             if (!ModelState.IsValid)
             {
+
+                foreach (var item in ModelState)
+                {
+                    foreach (var error in item.Value.Errors)
+                    {
+                        Console.WriteLine($"{item.Key} => {error.ErrorMessage}");
+                    }
+                }
+
                 // If the model state is not valid, return the view with
                 // the productVM and category list
                 productVM.CategoryList = await _productService.GetCategoriesAsync();
                 return View(productVM);
             }
-            var result = await _productService.CreateAsync(productVM, file);
+            var result = await _productService.CreateAsync(productVM);
 
             if (!result)
             {
@@ -105,7 +114,7 @@ namespace myshop.Web.Areas.Admin.Controllers
         
         [HttpPost]
         [Authorize(Policy = "OnlyAdmin")]
-        public async Task<IActionResult> Edit(ProductVM productVM, IFormFile? file)
+        public async Task<IActionResult> Edit(ProductVM productVM)
         {
             if (!ModelState.IsValid) { 
             
@@ -114,7 +123,7 @@ namespace myshop.Web.Areas.Admin.Controllers
             }
 
             // update the product 
-            var isUpdated = await _productService.UpdateAsync(productVM, file);
+            var isUpdated = await _productService.UpdateAsync(productVM);
             if (!isUpdated) {
                 productVM.CategoryList = await _productService.GetCategoriesAsync();
                 return View(productVM);

@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using myShop.BLL.Services.AttachmentServiec;
 
 namespace myShop.BLL.Services.Classes
 {
@@ -23,46 +24,46 @@ namespace myShop.BLL.Services.Classes
         private readonly IUnitOfWork _unitOfWork;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IMapper _mapper;
+        private readonly IAttachmentServiec _attachmentServiec;
 
         public ProductService(IUnitOfWork unitOfWork , 
-               IWebHostEnvironment webHostEnvironment , IMapper mapper) 
+               IWebHostEnvironment webHostEnvironment , IMapper mapper ,
+               IAttachmentServiec attachmentServiec) 
         {
             _unitOfWork = unitOfWork;
             _webHostEnvironment = webHostEnvironment;
             _mapper = mapper;
+            _attachmentServiec = attachmentServiec;
         }
-        public async Task<bool> CreateAsync(ProductVM productVM, IFormFile file)
+        public async Task<bool> CreateAsync(ProductVM productVM)
         {
-            string? imagePath = null;
+
 
             try
             {
                 string rootPath = _webHostEnvironment.WebRootPath;
+                if (productVM.ImageFile is not null)
+                { 
 
-                if (file is not null)
-                {
-                    string fileName = Guid.NewGuid().ToString();
+                    var imagePath = await _attachmentServiec.UploadAsync(
+                        productVM.ImageFile.OpenReadStream(),
+                        productVM.ImageFile.FileName,
+                        "Products");
 
-                    var path = Path.Combine(rootPath, "Images", "Products");
+                    if(string.IsNullOrWhiteSpace(imagePath))
+                        return false;
 
-                    var ext = Path.GetExtension(file.FileName);
-
-                    imagePath = Path.Combine(path, fileName + ext);
-
-                    await using var fileStream = new FileStream(imagePath, FileMode.Create);
-                    await file.CopyToAsync(fileStream);
-
-                    productVM.Product.Img = @"Images\Products\" + fileName + ext;
+                    productVM.Product.Img = imagePath;
                 }
 
-                await _unitOfWork.GetGenericRepository<myshop.Models.Product>()
+                await _unitOfWork.GetGenericRepository<Product>()
                                  .AddAsync(productVM.Product);
 
                 var isCreated = await _unitOfWork.SaveChangesAsync() > 0;
 
                 if (!isCreated)
                 {
-                    DeleteImageIfExists(imagePath);
+                    _attachmentServiec.Delete(productVM.ImageFile!.FileName, "Products");
                     return false;
                 }
 
@@ -71,22 +72,23 @@ namespace myShop.BLL.Services.Classes
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                DeleteImageIfExists(imagePath);
+                _attachmentServiec.Delete(productVM.ImageFile!.FileName, "Products");
                 return false;
             }
         }
  
         public async Task<bool> DeleteAsync(int id)
         {
-            var repo = _unitOfWork.GetGenericRepository<myshop.Models.Product>();
+            var repo = _unitOfWork.GetGenericRepository<Product>();
             var product = await repo.GetByIdAsync(id);
             if (product is null)
                 return false;
 
             if (!string.IsNullOrEmpty(product.Img)) {
-                var oldimg = Path.Combine(_webHostEnvironment.WebRootPath, product.Img.TrimStart('\\'));
-                if (File.Exists(oldimg))
-                        File.Delete(oldimg);
+
+                var imageName = Path.GetFileName(product.Img);
+
+                _attachmentServiec.Delete(imageName, "uploads/Products");
 
               
             }
@@ -115,44 +117,52 @@ namespace myShop.BLL.Services.Classes
 
         } // done
 
-        public async Task<bool> UpdateAsync(ProductVM productVM, IFormFile? file)
+        public async Task<bool> UpdateAsync(ProductVM productVM)
         {
+            var repo = _unitOfWork.GetGenericRepository<Product>();
 
-            // get root path 
-            var rootPath = _webHostEnvironment.WebRootPath;
-            // check if the client upload new image or not 
-            if (file is not null)
+            var product = await repo.GetByIdAsync(productVM.Product.Id);
+
+            if (product is null)
+                return false;
+
+            _mapper.Map(productVM.Product, product);
+
+            string? oldImg = null;
+            string? newImagePath = null;
+
+            if (productVM.ImageFile is not null)
             {
-                // create a unique filename for the uploaded image
-                string filename = Guid.NewGuid().ToString();
-                // combine the root path with the folder path to save the image
-                var Upload = Path.Combine(rootPath, @"Images\Products");
-                // get the file extension of the uploaded image
-                var ext = Path.GetExtension(file.FileName);
+                newImagePath = await _attachmentServiec.UploadAsync(
+                    productVM.ImageFile.OpenReadStream(),
+                    productVM.ImageFile.FileName,
+                    "Products");
 
-                // delete the old image file if it exists
-                if (productVM.Product.Img != null)
-                {
-                    var oldimg = Path.Combine(rootPath, productVM.Product.Img.TrimStart('\\'));
+                if (string.IsNullOrWhiteSpace(newImagePath))
+                    return false;
 
-                    if (File.Exists(oldimg))
-                    {
-                        File.Delete(oldimg);
-                    }
-                }
-
-                // save the new image file to the server
-                using (var filestream = new FileStream(Path.Combine(Upload, filename + ext), FileMode.Create))
-                {
-                    await file.CopyToAsync(filestream);
-                }
-                // update the product's image path in the database
-                productVM.Product.Img = @"Images\Products\" + filename + ext;
+                oldImg = product.Img;
+                product.Img = newImagePath;
             }
 
+            repo.Update(product);
 
-            _unitOfWork.GetGenericRepository<Product>().Update(productVM.Product);
-            return await _unitOfWork.SaveChangesAsync() > 0;
+            var result = await _unitOfWork.SaveChangesAsync() > 0;
+
+            if (result && !string.IsNullOrWhiteSpace(oldImg))
+            {
+                var oldImageName = Path.GetFileName(oldImg);
+                _attachmentServiec.Delete(oldImageName, "uploads/Products");
+            }
+
+            if (!result && !string.IsNullOrWhiteSpace(newImagePath))
+            {
+                // الحفظ فشل بعد رفع صورة جديدة → امسحها عشان متفضلش orphaned
+                var newImageName = Path.GetFileName(newImagePath);
+                _attachmentServiec.Delete(newImageName, "uploads/Products");
+            }
+
+            return result;
         }
 
         public async Task<Product?> GetByIdAsync(int id)
@@ -167,19 +177,6 @@ namespace myShop.BLL.Services.Classes
         } // done
 
 
-        #region Helper Methods
 
-        private static void DeleteImageIfExists(string? imagePath)
-        {
-            if (!string.IsNullOrEmpty(imagePath) && File.Exists(imagePath))
-            {
-                File.Delete(imagePath);
-            }
-
-        } // done
-
-
-
-        #endregion
     }
 }

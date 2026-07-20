@@ -6,6 +6,7 @@ using myshop.DataAccess;
 using myshop.Entities.Models;
 using myshop.PL;
 using myShop.BLL.Mapping;
+using myShop.BLL.Services.AttachmentServiec;
 using myShop.BLL.Services.Classes;
 using myShop.BLL.Services.Interfaces;
 using myShop.DAL.Repositories.Classes;
@@ -56,6 +57,7 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddAutoMapper(typeof(MappingReference).Assembly);
 builder.Services.AddScoped<ICategoryService , CategoryService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAttachmentServiec, AttachmentServiec>();
 
 
 
