@@ -1,0 +1,525 @@
+﻿@model IEnumerable<myShop.BLL.DTOS.ProductListDTO>
+
+@{
+    Layout = "~/Views/Shared/_Customer.cshtml";
+}
+
+<style>
+
+    /* =========================
+       PRODUCTS PAGE
+    ========================= */
+
+    .products-page {
+        padding: 55px 0 80px;
+    }
+
+
+    /* =========================
+       PAGE HEADER
+    ========================= */
+
+    .products-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 35px;
+        gap: 20px;
+    }
+
+    .products-header h2 {
+        color: #1f3f88;
+        font-size: 32px;
+        font-weight: 800;
+        margin: 0;
+    }
+
+    .products-header p {
+        color: #6c757d;
+        margin: 8px 0 0;
+        font-size: 15px;
+    }
+
+
+    /* =========================
+       SEARCH
+    ========================= */
+
+    .search-wrapper {
+        position: relative;
+        width: 320px;
+    }
+
+    .search-wrapper i {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #1769ff;
+        font-size: 17px;
+    }
+
+    .search-box {
+        width: 100%;
+        height: 48px;
+        padding: 0 18px 0 45px;
+        border: 1px solid #d9e2f0;
+        border-radius: 12px;
+        outline: none;
+        background: white;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .search-box:focus {
+        border-color: #1769ff;
+        box-shadow: 0 0 0 4px rgba(23, 105, 255, 0.12);
+    }
+
+
+    /* =========================
+       PRODUCT CARD
+    ========================= */
+
+    .products-card {
+        height: 100%;
+        background: white;
+        border-radius: 18px;
+        overflow: hidden;
+        border: 1px solid #e8edf5;
+        box-shadow: 0 8px 22px rgba(31, 63, 136, 0.08);
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .products-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 18px 35px rgba(31, 63, 136, 0.18);
+    }
+
+
+    /* =========================
+       IMAGE CONTAINER
+    ========================= */
+
+    .product-image-container {
+        width: 100%;
+        height: 240px;
+        background: #f8fafc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        position: relative;
+    }
+
+
+    /* =========================
+       PRODUCT IMAGE
+    ========================= */
+
+    .product-image {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        padding: 15px;
+        transition: transform 0.4s ease;
+    }
+
+    .products-card:hover .product-image {
+        transform: scale(1.05);
+    }
+
+
+    /* =========================
+       CATEGORY
+    ========================= */
+
+    .product-category {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        background: white;
+        color: #244488;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+    }
+
+
+    /* =========================
+       CARD BODY
+    ========================= */
+
+    .product-body {
+        padding: 22px;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+
+    .product-name {
+        color: #1f3f88;
+        font-size: 19px;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .product-description {
+        color: #6c757d;
+        font-size: 14px;
+        line-height: 1.6;
+        min-height: 48px;
+        margin-bottom: 15px;
+    }
+
+
+    /* =========================
+       FOOTER
+    ========================= */
+
+    .product-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-top: auto;
+    }
+
+    .product-price {
+        color: #1769ff;
+        font-size: 21px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+
+    /* =========================
+       ADD TO CART
+    ========================= */
+
+    .add-cart-btn {
+        border: none;
+        background: linear-gradient(
+            135deg,
+            #244488,
+            #1769ff
+        );
+        color: white;
+        padding: 10px 14px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+    }
+
+    .add-cart-btn:hover {
+        background: linear-gradient(
+            135deg,
+            #1769ff,
+            #0d52d6
+        );
+        transform: translateY(-2px);
+        box-shadow: 0 7px 15px rgba(23, 105, 255, 0.3);
+    }
+
+
+    /* =========================
+       EMPTY PRODUCTS
+    ========================= */
+
+    .empty-products {
+        background: white;
+        padding: 60px 20px;
+        border-radius: 18px;
+        text-align: center;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .empty-products i {
+        font-size: 50px;
+        color: #1769ff;
+        margin-bottom: 15px;
+    }
+
+    .empty-products h4 {
+        color: #1f3f88;
+        font-weight: 700;
+    }
+
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+
+    @@media (max-width: 768px) {
+
+        .products-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .products-header h2 {
+            font-size: 28px;
+        }
+
+        .search-wrapper {
+            width: 100%;
+        }
+
+    }
+
+
+    @@media (max-width: 576px) {
+
+        .product-footer {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .product-price {
+            text-align: center;
+        }
+
+        .add-cart-btn {
+            width: 100%;
+        }
+
+    }
+
+</style>
+
+
+<section class="products-page">
+
+    <div class="container">
+
+
+        <!-- PAGE HEADER -->
+
+        <div class="products-header">
+
+            <div>
+
+                <h2>
+
+                    <i class="bi bi-grid-3x3-gap-fill"></i>
+
+                    Explore Products
+
+                </h2>
+
+                <p>
+
+                    Find the perfect products for you
+
+                </p>
+
+            </div>
+
+
+            <!-- SEARCH -->
+
+            <div class="search-wrapper">
+
+                <i class="bi bi-search"></i>
+
+                <input type="text"
+                       id="searchInput"
+                       class="search-box"
+                       placeholder="Search products..." />
+
+            </div>
+
+        </div>
+
+
+        <!-- PRODUCTS -->
+
+        <div class="row g-4"
+             id="productsContainer">
+
+
+            @if (Model != null && Model.Any())
+            {
+
+                foreach (var product in Model)
+                {
+
+                    <div class="col-xl-3 col-lg-4 col-md-6 product-item">
+
+
+                        <div class="products-card">
+
+
+                            <!-- IMAGE -->
+
+                            <div class="product-image-container">
+
+                                <img src="~/uploads/products/@product.Img"
+                                     class="product-image"
+                                     alt="@product.Name" />
+
+
+                                <!-- CATEGORY -->
+
+                                <span class="product-category">
+
+                                    <i class="bi bi-tag"></i>
+
+                                    @product.CategoryName
+
+                                </span>
+
+                            </div>
+
+
+                            <!-- BODY -->
+
+                            <div class="product-body">
+
+
+                                <h5 class="product-name">
+
+                                    @product.Name
+
+                                </h5>
+
+
+                                <p class="product-description">
+
+                                    @product.Description
+
+                                </p>
+
+
+                                <div class="product-footer">
+
+
+                                    <div class="product-price">
+
+                                        @product.Price EGP
+
+                                    </div>
+
+
+<form asp-controller="Cart"
+      asp-action="AddToCart"
+      method="post">
+
+    <input type="hidden"
+           name="ProductId"
+           value="@product.Id" />
+
+    <input type="hidden"
+           name="Quantity"
+           value="1" />
+
+    <button type="submit"
+            class="add-cart-btn">
+
+        <i class="bi bi-cart-plus"></i>
+
+        Add To Cart
+
+    </button>
+
+</form>
+
+
+                                </div>
+
+
+                            </div>
+
+
+                        </div>
+
+
+                    </div>
+
+                }
+
+            }
+
+            else
+            {
+
+                <div class="col-12">
+
+                    <div class="empty-products">
+
+                        <i class="bi bi-box-seam"></i>
+
+                        <h4>
+
+                            No Products Available
+
+                        </h4>
+
+                        <p class="text-muted">
+
+                            There are no products available at the moment.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            }
+
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+<script>
+
+    const searchInput =
+        document.getElementById("searchInput");
+
+    const products =
+        document.querySelectorAll(".product-item");
+
+
+    searchInput.addEventListener("keyup", function () {
+
+        const searchValue =
+            this.value.toLowerCase().trim();
+
+
+        products.forEach(product => {
+
+            const productName =
+                product.querySelector(".product-name")
+                       .innerText
+                       .toLowerCase();
+
+
+            if (productName.includes(searchValue)) {
+
+                product.style.display = "";
+
+            }
+
+            else {
+
+                product.style.display = "none";
+
+            }
+
+        });
+
+    });
+
+</script>

@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace myshop.Web.Areas.Admin.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = "OnlyAdmin")]
     public class ProductController : Controller
     {
 
@@ -40,7 +40,7 @@ namespace myshop.Web.Areas.Admin.Controllers
         } // done
 
         [HttpGet]
-        [Authorize(Policy = "OnlyAdmin")]
+       
         public async Task<IActionResult> Create()
         {
             ProductVM productVM = new()
@@ -52,7 +52,7 @@ namespace myshop.Web.Areas.Admin.Controllers
         } // done 
 
         [HttpPost]
-        [Authorize(Policy = "OnlyAdmin")]
+       
         public async Task<IActionResult> Create(ProductVM productVM)
         {
 
@@ -88,7 +88,7 @@ namespace myshop.Web.Areas.Admin.Controllers
         } // done
 
         [HttpGet]
-        [Authorize(Policy = "OnlyAdmin")]
+       
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || id == 0)
@@ -113,7 +113,7 @@ namespace myshop.Web.Areas.Admin.Controllers
         } // done
         
         [HttpPost]
-        [Authorize(Policy = "OnlyAdmin")]
+        
         public async Task<IActionResult> Edit(ProductVM productVM)
         {
             if (!ModelState.IsValid) { 
@@ -134,7 +134,7 @@ namespace myshop.Web.Areas.Admin.Controllers
         }
         
         [HttpPost]
-        [Authorize(Policy = "OnlyAdmin")]
+       
         public async Task<IActionResult> Delete(int id)
         {
 

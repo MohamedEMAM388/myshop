@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace myshop.PL.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = "OnlyAdmin")]
     public class UserController : Controller
     {
         private readonly IUserService _userService;

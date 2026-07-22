@@ -1,4 +1,8 @@
 ﻿@{
+    Layout = User.IsInRole("Admin")
+        ? "~/Views/Shared/_Layout.cshtml"
+        : "~/Views/Shared/_Customer.cshtml";
+
     ViewData["Title"] = "Home";
 }
 

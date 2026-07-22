@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
+using myshop.Models;
 using myShop.BLL.DTOS.ShoppingCart;
 using myShop.BLL.Services.Interfaces;
+using myShop.DAL.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,38 +16,47 @@ namespace myShop.BLL.Services.Classes
     {
         // httpcontex have info for current http request  
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IUnitOfWork _unitOfWork;
+
         // key for store cart in session
         private const string CartSessionKey = "Cart";
-        public CartService(IHttpContextAccessor httpContextAccessor)
+        public CartService(IHttpContextAccessor httpContextAccessor , IUnitOfWork unitOfWork)
         {
             _httpContextAccessor = httpContextAccessor;
+            _unitOfWork = unitOfWork;
         }
-        public void Additem(CartItemDTO cartItem)
+        public async Task Additem(int productId)
         {
-            // get cart 
+            var product = await _unitOfWork
+                 .GetGenericRepository<Product>()
+                .GetByIdAsync(productId);
+
+            if (product is null)
+                throw new Exception("Product not found.");
+
             var cart = GetCart();
 
-            // check if item is exist 
-            var existingItem = cart.Items.
-                               FirstOrDefault(x => x.ProductId == cartItem.ProductId);
+            var existingItem = cart.Items
+                                   .FirstOrDefault(x => x.ProductId == productId);
 
-            // if existingItem true then increase quantity
             if (existingItem is not null)
             {
-
-                existingItem.Quantity += cartItem.Quantity;
+                existingItem.Quantity++;
             }
             else
-            { 
-            
-                // add item to cart 
-                cart.Items.Add(cartItem);
-
+            {
+                cart.Items.Add(new CartItemDTO
+                {
+                    ProductId = product.Id,
+                    ProductName = product.Name,
+                    Price = product.Price,
+                    Quantity = 1,
+                    ImageUrl = product.Img
+                });
             }
 
             SaveCart(cart);
-
-        } // done 
+        }
 
         public void ClearCart()
         {

@@ -10,7 +10,7 @@ namespace myshop.Web.Areas.Admin.Controllers
 {
 
 
-    [Authorize]
+    [Authorize(Policy = "OnlyAdmin")]
     public class CategoryController : Controller
     {
       
@@ -28,7 +28,7 @@ namespace myshop.Web.Areas.Admin.Controllers
         } // done 
 
         [HttpGet]
-        [Authorize(Policy = "OnlyAdmin")]
+        
         public IActionResult Create()
         {
 
@@ -36,7 +36,7 @@ namespace myshop.Web.Areas.Admin.Controllers
         } // done 
 
         [HttpPost]
-        [Authorize(Policy = "OnlyAdmin")]
+
         public async Task<IActionResult> Create(CategoryDTO categoryVm)
         {
             if (!ModelState.IsValid)
@@ -53,7 +53,7 @@ namespace myshop.Web.Areas.Admin.Controllers
         } // done 
 
         [HttpGet]
-        [Authorize(Policy = "OnlyAdmin")]
+
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null | id == 0)
@@ -66,7 +66,7 @@ namespace myshop.Web.Areas.Admin.Controllers
         } // done 
 
         [HttpPost]
-        [Authorize(Policy = "OnlyAdmin")]
+   
         public async Task<IActionResult> Edit(CategoryDTO categoryVm)
         {
             if(!ModelState.IsValid)
@@ -81,7 +81,7 @@ namespace myshop.Web.Areas.Admin.Controllers
         } // done
 
         [HttpGet]
-        [Authorize(Policy = "OnlyAdmin")]
+
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null | id == 0)
@@ -96,7 +96,7 @@ namespace myshop.Web.Areas.Admin.Controllers
         } // done
 
         [HttpPost]
-        [Authorize(Policy = "OnlyAdmin")]
+
         public async Task<IActionResult> DeleteCategory(int? id)
         {
             var isDeleted = await _categoryService.DeleteAsync(id!.Value);

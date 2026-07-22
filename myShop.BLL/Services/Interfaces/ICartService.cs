@@ -13,7 +13,7 @@ namespace myShop.BLL.Services.Interfaces
         public CartDto GetCart();
 
         // add item
-        public void Additem(CartItemDTO cartItem);
+        public Task Additem(int productId);
 
         // remove item 
         public void RemoveItem(int productid);

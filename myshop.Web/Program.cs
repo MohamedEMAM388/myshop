@@ -58,6 +58,7 @@ builder.Services.AddAutoMapper(typeof(MappingReference).Assembly);
 builder.Services.AddScoped<ICategoryService , CategoryService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAttachmentServiec, AttachmentServiec>();
+builder.Services.AddScoped<ICartService, CartService>();
 
 
 
@@ -93,9 +94,13 @@ app.MapRazorPages();
 //app.MapControllerRoute(
 //    name: "default",
 //    pattern: "{controller=Home}/{action=Index}/{id?}");
+//app.MapControllerRoute(
+//    name: "default",
+//    pattern: "{controller=Product}/{action=Index}/{id?}");
+
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Product}/{action=Index}/{id?}");
+    pattern: "{controller=Account}/{action=Login}/{id?}");
 
 app.Run();
 

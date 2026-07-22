@@ -2,6 +2,11 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 
+@{
+    var email = UserManager.GetUserName(User);
+    var userName = email?.Split('@')[0];
+}
+
 <style>
     .nav-link-box {
         display: inline-block;
@@ -16,48 +21,86 @@
         transition: 0.3s ease;
     }
 
-        .nav-link-box:hover {
-            background: linear-gradient(135deg, #005bea 0%, #00c6fb 100%);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 22px rgba(0,0,0,0.25);
-        }
+    .nav-link-box:hover {
+        background: linear-gradient(135deg, #005bea 0%, #00c6fb 100%);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 22px rgba(0,0,0,0.25);
+    }
 
-        .nav-link-box.logout-btn {
-            padding: 0.5rem 1rem;
-            background: linear-gradient(135deg, #ff6a00 0%, #ee0979 100%);
-            color: #fff !important;
-        }
+    .nav-link-box.logout-btn {
+        padding: 0.5rem 1rem;
+        background: linear-gradient(135deg, #ff6a00 0%, #ee0979 100%);
+        color: #fff !important;
+    }
 
-            .nav-link-box.logout-btn:hover {
-                background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
-                transform: translateY(-3px);
-                box-shadow: 0 8px 22px rgba(0,0,0,0.25);
-            }
+    .nav-link-box.logout-btn:hover {
+        background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 22px rgba(0,0,0,0.25);
+    }
 </style>
 
 <ul class="navbar-nav d-flex align-items-center">
+
     @if (SignInManager.IsSignedIn(User))
     {
         <li class="nav-item">
-            <a id="manage" class="nav-link-box" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
-                Hello @UserManager.GetUserName(User)!
+
+            <a id="manage"
+               class="nav-link-box"
+               asp-controller="User"
+               asp-action="Profile">
+
+                Hello @userName!
+
             </a>
+
         </li>
+
         <li class="nav-item">
-            <form id="logoutForm" class="d-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                <button id="logout" type="submit" class="nav-link-box logout-btn border-0">
+
+            <form asp-controller="Account"
+                  asp-action="Logout"
+                  method="post"
+                  class="d-inline">
+
+                <button type="submit"
+                        class="nav-link-box logout-btn border-0">
+
+                    <i class="bi bi-box-arrow-right"></i>
                     Logout
+
                 </button>
+
             </form>
+
         </li>
     }
     else
     {
         <li class="nav-item">
-            <a class="nav-link-box" id="register" asp-area="Identity" asp-page="/Account/Register">Register</a>
+
+            <a class="nav-link-box"
+               asp-controller="Account"
+               asp-action="Register">
+
+                Register
+
+            </a>
+
         </li>
+
         <li class="nav-item">
-            <a class="nav-link-box" id="login" asp-area="Identity" asp-page="/Account/Login">Login</a>
+
+            <a class="nav-link-box"
+               asp-controller="Account"
+               asp-action="Login">
+
+                Login
+
+            </a>
+
         </li>
     }
+
 </ul>

@@ -24,38 +24,74 @@ namespace myshop.PL.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginDTO model) {
-
-            // validate on loginvm
+        public async Task<IActionResult> Login(LoginDTO model)
+        {
+            // Validate Model
             if (!ModelState.IsValid)
                 return View(model);
-            // check if user exist 
-            var User = await _userManager.FindByEmailAsync(model.Email);
-            if (User is null) {
 
-                ModelState.AddModelError("InvalidLogin", "Invalid Email Or Password");
+
+            // Find User
+            var user = await _userManager.FindByEmailAsync(model.Email);
+
+            if (user is null)
+            {
+                ModelState.AddModelError(
+                    "InvalidLogin",
+                    "Invalid Email Or Password"
+                );
+
                 return View(model);
             }
 
-         
-            
 
-            var result = await _signInManager.PasswordSignInAsync(User,
-                                             model.Password, model.RememberMe, false);
+            // Sign In
+            var result = await _signInManager.PasswordSignInAsync(
+                user,
+                model.Password,
+                model.RememberMe,
+                lockoutOnFailure: false
+            );
 
-            
+
             if (result.Succeeded)
-                return RedirectToAction("Index", "Home");
-            else if (result.IsLockedOut)
-                ModelState.AddModelError("InvalidLogin", "Your account is locked out.");
+            {
+                // Admin
+                if (await _userManager.IsInRoleAsync(user, "Admin"))
+                {
+                    return RedirectToAction(
+                        "Index",
+                        "Home"
+                    );
+                }
+
+                // Customer
+                return RedirectToAction(
+                    "Index",
+                    "Home"
+                );
+            }
+
+
+            if (result.IsLockedOut)
+                ModelState.AddModelError(
+                    "InvalidLogin",
+                    "Your account is locked out."
+                );
             else if (result.IsNotAllowed)
-                ModelState.AddModelError("InvalidLogin", "Your account is not allowed.");
+                ModelState.AddModelError(
+                    "InvalidLogin",
+                    "Your account is not allowed."
+                );
             else
-                ModelState.AddModelError("InvalidLogin", "Invalid Email or Password.");
+                ModelState.AddModelError(
+                    "InvalidLogin",
+                    "Invalid Email or Password."
+                );
+
 
 
             return View(model);
-
         }
 
         [HttpGet]
