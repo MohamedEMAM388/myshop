@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace myShop.BLL.Services.Classes
 {
@@ -17,11 +18,15 @@ namespace myShop.BLL.Services.Classes
     {
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMemoryCache _memoryCache;
 
-        public CategoryService(IMapper mapper , IUnitOfWork unitOfWork) 
+        private const string CategoriesCacheKey = "Categories";
+        public CategoryService(IMapper mapper , IUnitOfWork unitOfWork ,
+                       IMemoryCache memoryCache ) 
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
+            _memoryCache = memoryCache;
         }
         public async Task<bool> CreateAsync(CategoryDTO categoryVm)
         {
@@ -30,16 +35,33 @@ namespace myShop.BLL.Services.Classes
             // map from categoryvm to category
             var category = _mapper.Map<Category>(categoryVm);
             await  _unitOfWork.GetGenericRepository<Category , int>().AddAsync(category);
-            return await _unitOfWork.SaveChangesAsync() > 0;
+            
+            var result = await _unitOfWork.SaveChangesAsync() > 0;
+
+            if (result)
+                _memoryCache.Remove(CategoriesCacheKey);
+            return result;
 
     
         }
 
         public async Task<IEnumerable<CategoryDTO>> GetAllAsync()
         {
-            var categories = await _unitOfWork.GetGenericRepository<Category , int>().GetAllAsync();
-            // map from category to categoryvm
-            return _mapper.Map<IEnumerable<CategoryDTO>>(categories);
+            if (_memoryCache.TryGetValue(CategoriesCacheKey, out IEnumerable<CategoryDTO>? categories))
+                  return categories!; 
+
+            var categoryEntities = await _unitOfWork
+                .GetGenericRepository<Category, int>()
+                .GetAllAsync();
+
+            categories = _mapper.Map<IEnumerable<CategoryDTO>>(categoryEntities);
+
+            _memoryCache.Set(
+                 CategoriesCacheKey,
+                 categories,
+                TimeSpan.FromMinutes(30));
+
+            return categories;
         }
 
         public async Task<CategoryDTO?> GetByIdAsync(int id)
@@ -53,6 +75,8 @@ namespace myShop.BLL.Services.Classes
 
         public async Task<bool> UpdateAsync(CategoryDTO categoryVm)
         {
+            if (categoryVm is null)
+                return false;
             var category = await _unitOfWork
                 .GetGenericRepository<Category , int>()
                 .GetByIdAsync(categoryVm.Id);
@@ -62,7 +86,10 @@ namespace myShop.BLL.Services.Classes
 
             _mapper.Map(categoryVm, category);
 
-            return await _unitOfWork.SaveChangesAsync() > 0;
+            var result = await _unitOfWork.SaveChangesAsync() > 0;
+            if (result)
+                _memoryCache.Remove(CategoriesCacheKey);
+            return result;
         }
 
 
@@ -73,7 +100,10 @@ namespace myShop.BLL.Services.Classes
             if (category is null)
                 return false;
             _unitOfWork.GetGenericRepository<Category , int>().Delete(category);
-            return await _unitOfWork.SaveChangesAsync() > 0;
+            var result = await _unitOfWork.SaveChangesAsync() > 0;
+            if (result)
+                _memoryCache.Remove(CategoriesCacheKey);
+            return result;
         }
     }
 }
