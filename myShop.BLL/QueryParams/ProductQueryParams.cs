@@ -9,13 +9,16 @@ namespace myShop.BLL.QueryParams
     public class ProductQueryParams
     {
 
+        #region Paginattion
         private int _pageIndex = 1;
-        public int PageIndex {
+        public int PageIndex
+        {
 
             get => _pageIndex;
 
-            set { 
-            
+            set
+            {
+
                 _pageIndex = (value <= 0) ? _pageIndex : value;
             }
         }
@@ -28,7 +31,8 @@ namespace myShop.BLL.QueryParams
         {
             get => _pagesize;
 
-            set {
+            set
+            {
 
                 if (value <= 0)
                     _pagesize = DefaultPageSize;
@@ -38,6 +42,11 @@ namespace myShop.BLL.QueryParams
                     _pagesize = value;
             }
         }
+        #endregion
+
+        public string? Search { get; set; }
+
+        public ProductSorting? Sort { get; set; }
 
     }
 }

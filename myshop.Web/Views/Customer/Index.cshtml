@@ -293,6 +293,72 @@
 
     }
 
+    /* =========================
+       FILTER BAR
+    ========================= */
+
+    .filter-form {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 35px;
+        flex-wrap: wrap;
+    }
+
+    .sort-select {
+        height: 48px;
+        min-width: 170px;
+        border: 1px solid #d9e2f0;
+        border-radius: 12px;
+        padding: 0 15px;
+        background: white;
+        font-size: 15px;
+        outline: none;
+        transition: .3s;
+        box-shadow: 0 4px 12px rgba(0,0,0,.05);
+    }
+
+        .sort-select:focus {
+            border-color: #1769ff;
+            box-shadow: 0 0 0 4px rgba(23,105,255,.12);
+        }
+
+    .apply-btn {
+        height: 48px;
+        padding: 0 22px;
+        border: none;
+        border-radius: 12px;
+        background: linear-gradient(135deg,#244488,#1769ff);
+        color: white;
+        font-weight: 600;
+        transition: .3s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .apply-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(23,105,255,.30);
+        }
+
+        .apply-btn i {
+            font-size: 15px;
+        }
+
+    @@media (max-width:768px) {
+
+        .filter-form {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .sort-select,
+        .apply-btn {
+            width: 100%;
+        }
+    }
+
 </style>
 
 
@@ -326,16 +392,50 @@
 
             <!-- SEARCH -->
 
-            <div class="search-wrapper">
+            <form asp-action="Index" method="get" class="filter-form">
 
-                <i class="bi bi-search"></i>
+                <div class="search-wrapper">
+                    <i class="bi bi-search"></i>
 
-                <input type="text"
-                       id="searchInput"
-                       class="search-box"
-                       placeholder="Search products..." />
+                    <input type="text"
+                           name="Search"
+                           value="@Context.Request.Query["Search"]"
+                           class="search-box"
+                           placeholder="Search products..." />
+                </div>
 
-            </div>
+                <select name="Sort" class="sort-select">
+
+                    <option value="">Default</option>
+
+                    <option value="PriceAsc"
+                            selected="@(Context.Request.Query["Sort"] == "PriceAsc")">
+                        Price ↑
+                    </option>
+
+                    <option value="PriceDesc"
+                            selected="@(Context.Request.Query["Sort"] == "PriceDesc")">
+                        Price ↓
+                    </option>
+
+                    <option value="NameAsc"
+                            selected="@(Context.Request.Query["Sort"] == "NameAsc")">
+                        Name A-Z
+                    </option>
+
+                    <option value="NameDesc"
+                            selected="@(Context.Request.Query["Sort"] == "NameDesc")">
+                        Name Z-A
+                    </option>
+
+                </select>
+
+                <button type="submit" class="apply-btn">
+                    <i class="bi bi-funnel"></i>
+                    Apply
+                </button>
+
+            </form>
 
         </div>
 
@@ -409,15 +509,15 @@
                                     </div>
 
 
-<form asp-controller="Cart"
-      asp-action="AddToCart"
-      method="post">
+                            <form asp-controller="Cart"
+                                   asp-action="AddToCart"
+                                       method="post">
 
-    <input type="hidden"
-           name="ProductId"
-           value="@product.Id" />
+                                       <input type="hidden"
+                                          name="ProductId"
+                                          value="@product.Id" />
 
-    <input type="hidden"
+                                       <input type="hidden"
            name="Quantity"
            value="1" />
 
@@ -478,7 +578,7 @@
 
         </div>
 
-        @if (Model.TotalPages > 1)
+        @if (Model!.TotalPages > 1)
         {
             <nav class="mt-5">
                 <ul class="pagination justify-content-center">
@@ -489,7 +589,8 @@
                             <a class="page-link"
                                asp-action="Index"
                                asp-route-PageIndex="@(Model.CurrentPage - 1)"
-                               asp-route-PageSize="@Model.PageSize">
+                               asp-route-PageSize="@Model.PageSize"
+                               asp-route-Search="@Context.Request.Query["Search"]">
                                 Previous
                             </a>
                         </li>
@@ -501,7 +602,8 @@
                             <a class="page-link"
                                asp-action="Index"
                                asp-route-PageIndex="@i"
-                               asp-route-PageSize="@Model.PageSize">
+                               asp-route-PageSize="@Model.PageSize"
+                               asp-route-Search="@Context.Request.Query["Search"]">
                                 @i
                             </a>
                         </li>
@@ -513,7 +615,8 @@
                             <a class="page-link"
                                asp-action="Index"
                                asp-route-PageIndex="@(Model.CurrentPage + 1)"
-                               asp-route-PageSize="@Model.PageSize">
+                               asp-route-PageSize="@Model.PageSize"
+                               asp-route-Search="@Context.Request.Query["Search"]">
                                 Next
                             </a>
                         </li>
@@ -529,43 +632,3 @@
 </section>
 
 
-<script>
-
-    const searchInput =
-        document.getElementById("searchInput");
-
-    const products =
-        document.querySelectorAll(".product-item");
-
-
-    searchInput.addEventListener("keyup", function () {
-
-        const searchValue =
-            this.value.toLowerCase().trim();
-
-
-        products.forEach(product => {
-
-            const productName =
-                product.querySelector(".product-name")
-                       .innerText
-                       .toLowerCase();
-
-
-            if (productName.includes(searchValue)) {
-
-                product.style.display = "";
-
-            }
-
-            else {
-
-                product.style.display = "none";
-
-            }
-
-        });
-
-    });
-
-</script>

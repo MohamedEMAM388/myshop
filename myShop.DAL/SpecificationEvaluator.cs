@@ -11,26 +11,35 @@ namespace myShop.DAL
     public class SpecificationEvaluator
     {
 
-        public static IQueryable<TEntity> CreateQuery<TEntity, TKey>
-             (IQueryable<TEntity> entryPoint, ISpecification<TEntity, TKey> specification)
-             where TEntity : BaseEntity<TKey>
+        public static IQueryable<TEntity> CreateQuery<TEntity, TKey>(
+            IQueryable<TEntity> entryPoint,
+            ISpecification<TEntity, TKey> specification)
+            where TEntity : BaseEntity<TKey>
         {
+            var query = entryPoint;
 
-            var Query = entryPoint;
-
-            // check if specification not null
-            if (specification is not null) 
+            if (specification.Criteria is not null)
             {
-
-                if (specification.IsPaginated) { 
-                
-                    Query = Query.Skip(specification.Skip).Take(specification.Take);
-                }
-            
+                query = query.Where(specification.Criteria);
             }
 
-            return Query;
-        
+            if (specification.OrderBy is not null)
+            {
+                query = query.OrderBy(specification.OrderBy);
+            }
+
+            if (specification.OrderByDescending is not null)
+            {
+                query = query.OrderByDescending(specification.OrderByDescending);
+            }
+
+            if (specification.IsPaginated)
+            {
+                query = query.Skip(specification.Skip)
+                             .Take(specification.Take);
+            }
+
+            return query;
         }
     }
 }
