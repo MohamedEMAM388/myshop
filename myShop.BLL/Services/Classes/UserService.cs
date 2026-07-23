@@ -57,14 +57,12 @@ namespace myShop.BLL.Services.Classes
             }
 
             // return a PaginatedList object containing the results
-            return new PaginatedList<UserDTO>
-            {
-                Items = result,
-                CurrentPage = page,
-                PageSize = pageSize,
-                TotalCount = totalCount,
-                TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize)
-            };
+            return new PaginatedList<UserDTO>(
+                result,
+                totalCount,
+                page,
+                pageSize
+            );
         }
 
         public async Task<bool> PromoteToAdminAsync(string userId)

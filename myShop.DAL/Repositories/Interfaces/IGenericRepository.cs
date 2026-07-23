@@ -7,10 +7,12 @@ using System.Threading.Tasks;
 
 namespace myShop.DAL.Repositories.Interfaces
 {
-    public interface IGenericRepository<TEntity> where TEntity : BaseEntity , new() 
+    public interface IGenericRepository<TEntity , TKey> where TEntity : BaseEntity<TKey> , new() 
     {
         // get all data 
        Task<IEnumerable<TEntity>> GetAllAsync();
+        Task<IEnumerable<TEntity>> GetAllWithSpecification
+               (ISpecification<TEntity, TKey> specification);
 
         // get by id 
         Task<TEntity?> GetByIdAsync(int id);
@@ -21,6 +23,8 @@ namespace myShop.DAL.Repositories.Interfaces
         void Update(TEntity entity);
         // delete
         void Delete(TEntity entity);
+
+        Task<int> CountAsync();
 
 
     }

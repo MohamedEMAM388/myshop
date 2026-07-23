@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using myShop.BLL.QueryParams;
 using myShop.BLL.Services.Interfaces;
 
 namespace myshop.PL.Controllers
@@ -14,11 +15,9 @@ namespace myshop.PL.Controllers
         }
         [Route("Customer")]
         [Route("Customer/Index")]
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(ProductQueryParams queryParams)
         {
-
-            const int pageSize = 8;
-            var products = await _productService.GetPagedAsync(page , pageSize);
+            var products = await _productService.GetPagedAsync(queryParams);
             return View(products);
         }
     }

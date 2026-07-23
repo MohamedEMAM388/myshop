@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace myshop.Models
 {
-    public class Product : BaseEntity
+    public class Product : BaseEntity<int>
     {
        
 

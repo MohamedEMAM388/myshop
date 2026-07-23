@@ -488,7 +488,8 @@
                         <li class="page-item">
                             <a class="page-link"
                                asp-action="Index"
-                               asp-route-page="@(Model.CurrentPage - 1)">
+                               asp-route-PageIndex="@(Model.CurrentPage - 1)"
+                               asp-route-PageSize="@Model.PageSize">
                                 Previous
                             </a>
                         </li>
@@ -499,7 +500,8 @@
                         <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
                             <a class="page-link"
                                asp-action="Index"
-                               asp-route-page="@i">
+                               asp-route-PageIndex="@i"
+                               asp-route-PageSize="@Model.PageSize">
                                 @i
                             </a>
                         </li>
@@ -510,7 +512,8 @@
                         <li class="page-item">
                             <a class="page-link"
                                asp-action="Index"
-                               asp-route-page="@(Model.CurrentPage + 1)">
+                               asp-route-PageIndex="@(Model.CurrentPage + 1)"
+                               asp-route-PageSize="@Model.PageSize">
                                 Next
                             </a>
                         </li>

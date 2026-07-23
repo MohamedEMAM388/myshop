@@ -16,6 +16,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using myShop.BLL.Services.AttachmentServiec;
+using myShop.BLL.Specifications.ProductSpecifications;
+using myShop.BLL.QueryParams;
 
 namespace myShop.BLL.Services.Classes
 {
@@ -56,7 +58,7 @@ namespace myShop.BLL.Services.Classes
                     productVM.Product.Img = imagePath;
                 }
 
-                await _unitOfWork.GetGenericRepository<Product>()
+                await _unitOfWork.GetGenericRepository<Product , int>()
                                  .AddAsync(productVM.Product);
 
                 var isCreated = await _unitOfWork.SaveChangesAsync() > 0;
@@ -79,7 +81,7 @@ namespace myShop.BLL.Services.Classes
  
         public async Task<bool> DeleteAsync(int id)
         {
-            var repo = _unitOfWork.GetGenericRepository<Product>();
+            var repo = _unitOfWork.GetGenericRepository<Product , int>();
             var product = await repo.GetByIdAsync(id);
             if (product is null)
                 return false;
@@ -97,33 +99,32 @@ namespace myShop.BLL.Services.Classes
 
         } // done
 
-        public async Task<PaginatedList<ProductListDTO>> GetPagedAsync(int page, int pageSize)
+        public async Task<PaginatedList<ProductListDTO>> GetPagedAsync(ProductQueryParams queryParams)
         {
-            var query =  _unitOfWork.ProductRepository.GetAllWithLoadedData();
-            var totalCount = query.Count();
+            var spec = new ProductSPecification(queryParams);
 
-            var products = await query
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+            var products = await _unitOfWork.ProductRepository
+                .GetAllWithSpecification(spec);
 
-            var productsDTO = _mapper.Map<IEnumerable<ProductListDTO>>(products);
+            var totalCount = await _unitOfWork
+                .GetGenericRepository<Product, int>()
+                .CountAsync();
 
-            return new PaginatedList<ProductListDTO>() 
-            { 
-            
-                Items = productsDTO,
-                CurrentPage = page,
-                PageSize = pageSize,
-                TotalCount = totalCount,
-                TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize)
+            var productsDTO = _mapper.Map<List<ProductListDTO>>(products);
 
-            };
+            return new PaginatedList<ProductListDTO>(
+                productsDTO,
+                totalCount,
+                queryParams.PageIndex,
+                queryParams.PageSize
+            );
+
+
         } // done
 
         public async Task<IEnumerable<SelectListItem>> GetCategoriesAsync()
         {
-            var Categories = await _unitOfWork.GetGenericRepository<Category>().GetAllAsync();
+            var Categories = await _unitOfWork.GetGenericRepository<Category , int>().GetAllAsync();
 
             return Categories.Select(x => new SelectListItem {
                       Text = x.Name, 
@@ -135,7 +136,7 @@ namespace myShop.BLL.Services.Classes
 
         public async Task<bool> UpdateAsync(ProductVM productVM)
         {
-            var repo = _unitOfWork.GetGenericRepository<Product>();
+            var repo = _unitOfWork.GetGenericRepository<Product , int>();
 
             var product = await repo.GetByIdAsync(productVM.Product.Id);
 
@@ -183,7 +184,7 @@ namespace myShop.BLL.Services.Classes
 
         public async Task<Product?> GetByIdAsync(int id)
         {
-            var product = await _unitOfWork.GetGenericRepository<Product>().GetByIdAsync(id);
+            var product = await _unitOfWork.GetGenericRepository<Product , int>().GetByIdAsync(id);
             // check if product is null
             if (product is null)
                 return null;

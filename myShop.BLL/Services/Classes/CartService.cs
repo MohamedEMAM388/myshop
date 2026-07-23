@@ -28,7 +28,7 @@ namespace myShop.BLL.Services.Classes
         public async Task Additem(int productId)
         {
             var product = await _unitOfWork
-                 .GetGenericRepository<Product>()
+                 .GetGenericRepository<Product , int>()
                 .GetByIdAsync(productId);
 
             if (product is null)

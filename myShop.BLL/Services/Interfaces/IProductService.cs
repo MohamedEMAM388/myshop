@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using myshop.Entities.ViewModels;
 using myshop.Models;
 using myShop.BLL.DTOS;
+using myShop.BLL.QueryParams;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace myShop.BLL.Services.Interfaces
     public interface IProductService
     {
         // Get all products
-        Task<PaginatedList<ProductListDTO>> GetPagedAsync(int page, int pageSize);
+        Task<PaginatedList<ProductListDTO>> GetPagedAsync(ProductQueryParams queryParams);
 
         Task<IEnumerable<ProductListDTO>> GetAllAsync();
 

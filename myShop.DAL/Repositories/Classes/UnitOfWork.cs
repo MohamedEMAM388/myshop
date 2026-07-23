@@ -22,17 +22,17 @@ namespace myShop.DAL.Repositories.Classes
 
         public IProductRepository ProductRepository { get; }
 
-        public IGenericRepository<TEntity> GetGenericRepository<TEntity>() where TEntity : BaseEntity, new()
+        public IGenericRepository<TEntity , TKey> GetGenericRepository<TEntity , TKey>() where TEntity : BaseEntity<TKey>, new()
         {
 
             // get the type of the entity
             var type = typeof(TEntity);
             // check if the dictionary already contains the type
             if(_repositories.TryGetValue(type, out var repo))
-                return (IGenericRepository<TEntity>)repo; // unbox the repository from the dictionary and return it
+                return (IGenericRepository<TEntity , TKey>)repo; // unbox the repository from the dictionary and return it
 
             // if the repository does not exist, create a new one and add it to the dictionary
-            var newRepo = new GenericRepository<TEntity>(_applicationDb);
+            var newRepo = new GenericRepository<TEntity , TKey>(_applicationDb);
             // add the new repository to the dictionary
             _repositories.Add(type, newRepo);
             return newRepo;

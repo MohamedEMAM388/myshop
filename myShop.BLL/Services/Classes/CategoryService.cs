@@ -29,7 +29,7 @@ namespace myShop.BLL.Services.Classes
                 return false;
             // map from categoryvm to category
             var category = _mapper.Map<Category>(categoryVm);
-            await  _unitOfWork.GetGenericRepository<Category>().AddAsync(category);
+            await  _unitOfWork.GetGenericRepository<Category , int>().AddAsync(category);
             return await _unitOfWork.SaveChangesAsync() > 0;
 
     
@@ -37,7 +37,7 @@ namespace myShop.BLL.Services.Classes
 
         public async Task<IEnumerable<CategoryDTO>> GetAllAsync()
         {
-            var categories = await _unitOfWork.GetGenericRepository<Category>().GetAllAsync();
+            var categories = await _unitOfWork.GetGenericRepository<Category , int>().GetAllAsync();
             // map from category to categoryvm
             return _mapper.Map<IEnumerable<CategoryDTO>>(categories);
         }
@@ -45,7 +45,7 @@ namespace myShop.BLL.Services.Classes
         public async Task<CategoryDTO?> GetByIdAsync(int id)
         {
                 
-            var category = await _unitOfWork.GetGenericRepository<Category>().GetByIdAsync(id);
+            var category = await _unitOfWork.GetGenericRepository<Category , int>().GetByIdAsync(id);
             if (category is null)
                 return null;
             return _mapper.Map<CategoryDTO>(category);
@@ -54,7 +54,7 @@ namespace myShop.BLL.Services.Classes
         public async Task<bool> UpdateAsync(CategoryDTO categoryVm)
         {
             var category = await _unitOfWork
-                .GetGenericRepository<Category>()
+                .GetGenericRepository<Category , int>()
                 .GetByIdAsync(categoryVm.Id);
 
             if (category is null)
@@ -69,10 +69,10 @@ namespace myShop.BLL.Services.Classes
 
         public async Task<bool> DeleteAsync(int id)
         {
-            var category = await _unitOfWork.GetGenericRepository<Category>().GetByIdAsync(id);
+            var category = await _unitOfWork.GetGenericRepository<Category , int>().GetByIdAsync(id);
             if (category is null)
                 return false;
-            _unitOfWork.GetGenericRepository<Category>().Delete(category);
+            _unitOfWork.GetGenericRepository<Category , int>().Delete(category);
             return await _unitOfWork.SaveChangesAsync() > 0;
         }
     }

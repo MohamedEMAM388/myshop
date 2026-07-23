@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace myshop.Entities.Models
 {
-    public class Category : BaseEntity
+    public class Category : BaseEntity<int>
     {
         
 

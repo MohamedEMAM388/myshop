@@ -11,8 +11,8 @@ using System.Threading.Tasks;
 
 namespace myShop.DAL.Repositories.Classes
 {
-    public class GenericRepository<TEntity> : IGenericRepository<TEntity>
-                                   where TEntity : BaseEntity, new()
+    public class GenericRepository<TEntity,TKey> : IGenericRepository<TEntity , TKey>
+                                   where TEntity : BaseEntity<TKey>, new()
     {
         private readonly ApplicationDbContext _applicationDbContext;
 
@@ -26,6 +26,11 @@ namespace myShop.DAL.Repositories.Classes
             await _applicationDbContext.Set<TEntity>().AddAsync(entity);
         }
 
+        public async Task<int> CountAsync()
+        {
+            return await _applicationDbContext.Set<TEntity>().CountAsync();
+        }
+
         public void Delete(TEntity entity)
         {
              _applicationDbContext.Set<TEntity>().Remove(entity);
@@ -34,6 +39,13 @@ namespace myShop.DAL.Repositories.Classes
         public async Task<IEnumerable<TEntity>> GetAllAsync()
         {
            return await _applicationDbContext.Set<TEntity>().AsNoTracking().ToListAsync();
+        }
+
+        public async Task<IEnumerable<TEntity>> GetAllWithSpecification(ISpecification<TEntity, TKey> specification)
+        {
+            var query = SpecificationEvaluator.CreateQuery<TEntity, TKey>(_applicationDbContext.Set<TEntity>(), specification);
+
+            return await query.ToListAsync();
         }
 
         public async Task<TEntity?> GetByIdAsync(int id)

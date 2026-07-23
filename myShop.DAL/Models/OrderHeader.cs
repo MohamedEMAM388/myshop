@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace myshop.Entities.Models
 {
-    public class OrderHeader : BaseEntity
+    public class OrderHeader : BaseEntity<int>
     {
       
 

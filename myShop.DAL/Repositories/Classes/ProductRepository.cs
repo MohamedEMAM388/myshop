@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace myShop.DAL.Repositories.Classes
 {
-    public class ProductRepository : GenericRepository<Product> , IProductRepository
+    public class ProductRepository : GenericRepository<Product , int> , IProductRepository
     {
         private readonly ApplicationDbContext _applicationDb;
 

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace myshop.Entities.Models
 {
-    public class OrderDetail : BaseEntity
+    public class OrderDetail : BaseEntity<int>
     {
        
 

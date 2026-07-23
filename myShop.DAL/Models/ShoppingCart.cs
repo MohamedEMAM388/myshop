@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace myshop.Entities.Models
 {
-    public class ShoppingCart : BaseEntity
+    public class ShoppingCart : BaseEntity<int>
     {
 
 

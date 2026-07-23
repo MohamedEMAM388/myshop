@@ -7,20 +7,33 @@ using System.Threading.Tasks;
 
 namespace myShop.BLL
 {
-    public class PaginatedList<TEntity>
+    public class PaginatedList<T>
     {
-        public IEnumerable<TEntity> Items { get; set; } = [];
+        public IReadOnlyList<T> Items { get; }
 
-        public int CurrentPage { get; set; }
+        public int CurrentPage { get; }
 
-        public int TotalPages { get; set; }
+        public int TotalPages { get; }
 
-        public int PageSize { get; set; }
+        public int PageSize { get; }
 
-        public int TotalCount { get; set; }
+        public int TotalCount { get; }
 
         public bool HasPrevious => CurrentPage > 1;
 
         public bool HasNext => CurrentPage < TotalPages;
+
+        public PaginatedList(
+            IReadOnlyList<T> items,
+            int totalCount,
+            int currentPage,
+            int pageSize)
+        {
+            Items = items;
+            TotalCount = totalCount;
+            CurrentPage = currentPage;
+            PageSize = pageSize;
+            TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+        }
     }
 }

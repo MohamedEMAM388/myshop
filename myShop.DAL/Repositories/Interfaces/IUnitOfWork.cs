@@ -11,7 +11,7 @@ namespace myShop.DAL.Repositories.Interfaces
     public interface IUnitOfWork
     {
         // Define properties for each repository 
-        IGenericRepository<TEntity> GetGenericRepository<TEntity>() where TEntity : BaseEntity, new();
+        IGenericRepository<TEntity , TKey> GetGenericRepository<TEntity , TKey>() where TEntity : BaseEntity<TKey>, new();
 
         IProductRepository ProductRepository { get; }
 
