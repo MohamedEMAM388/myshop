@@ -13,7 +13,7 @@ namespace myShop.BLL.Services.Interfaces
     {
 
         // get all users => rerturn user dto 
-        public Task<PaginatedList> GetAllUsersAsync(int page, int pageSize);
+        public Task<PaginatedList<UserDTO>> GetAllUsersAsync(int page, int pageSize);
 
         //        Role Management
         //Allow administrators to:

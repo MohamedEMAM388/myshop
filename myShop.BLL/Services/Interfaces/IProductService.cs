@@ -14,10 +14,12 @@ namespace myShop.BLL.Services.Interfaces
     public interface IProductService
     {
         // Get all products
+        Task<PaginatedList<ProductListDTO>> GetPagedAsync(int page, int pageSize);
+
         Task<IEnumerable<ProductListDTO>> GetAllAsync();
 
         // Get all categories for dropdown
-        Task<IEnumerable<SelectListItem>> GetCategoriesAsync();
+        Task <IEnumerable<SelectListItem>> GetCategoriesAsync();
 
         // Create a new product
         Task<bool> CreateAsync(ProductVM productVM);

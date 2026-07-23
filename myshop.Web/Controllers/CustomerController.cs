@@ -14,9 +14,11 @@ namespace myshop.PL.Controllers
         }
         [Route("Customer")]
         [Route("Customer/Index")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
-            var products = await _productService.GetAllAsync();
+
+            const int pageSize = 8;
+            var products = await _productService.GetPagedAsync(page , pageSize);
             return View(products);
         }
     }

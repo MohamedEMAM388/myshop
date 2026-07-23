@@ -27,7 +27,7 @@ namespace myShop.BLL.Services.Classes
 
 
 
-        public async Task<PaginatedList> GetAllUsersAsync(int page, int pageSize)
+        public async Task<PaginatedList<UserDTO>> GetAllUsersAsync(int page, int pageSize)
         {
             var query = _userManager.Users;
 
@@ -57,7 +57,7 @@ namespace myShop.BLL.Services.Classes
             }
 
             // return a PaginatedList object containing the results
-            return new PaginatedList
+            return new PaginatedList<UserDTO>
             {
                 Items = result,
                 CurrentPage = page,

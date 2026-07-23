@@ -1,6 +1,9 @@
 ﻿$(document).ready(function () {
 
     $("#mytable").DataTable({
+
+        pageLength: 5,
+        lengthChange: false,
         ajax: {
             url: "/Product/GetData",
             type: "GET",

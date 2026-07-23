@@ -10,6 +10,6 @@ namespace myShop.DAL.Repositories.Interfaces
     public interface IProductRepository : IGenericRepository<Product>
     {
 
-        Task<IEnumerable<Product>> GetAllWithLoadedDataAsync();
+        IQueryable<Product> GetAllWithLoadedData();
     }
 }

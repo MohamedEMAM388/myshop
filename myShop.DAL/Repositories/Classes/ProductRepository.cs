@@ -18,9 +18,9 @@ namespace myShop.DAL.Repositories.Classes
         {
             _applicationDb = applicationDb;
         }
-        public async Task<IEnumerable<Product>> GetAllWithLoadedDataAsync()
+        public IQueryable<Product> GetAllWithLoadedData()
         {
-            return await _applicationDb.Products.Include(x => x.Category).ToListAsync();
+            return  _applicationDb.Products.Include(x => x.Category);
         }
     }
 }

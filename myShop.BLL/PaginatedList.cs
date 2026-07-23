@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace myShop.BLL
 {
-    public class PaginatedList
+    public class PaginatedList<TEntity>
     {
-        public IEnumerable<UserDTO> Items { get; set; } = [];
+        public IEnumerable<TEntity> Items { get; set; } = [];
 
         public int CurrentPage { get; set; }
 

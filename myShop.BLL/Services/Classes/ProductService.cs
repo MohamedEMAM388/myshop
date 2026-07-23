@@ -97,12 +97,28 @@ namespace myShop.BLL.Services.Classes
 
         } // done
 
-        public async Task<IEnumerable<ProductListDTO>> GetAllAsync()
+        public async Task<PaginatedList<ProductListDTO>> GetPagedAsync(int page, int pageSize)
         {
-            var products = await _unitOfWork.ProductRepository.GetAllWithLoadedDataAsync();
-            if (!products.Any())  return [];
-            // map from product to productVM
-            return _mapper.Map<IEnumerable<ProductListDTO>>(products);
+            var query =  _unitOfWork.ProductRepository.GetAllWithLoadedData();
+            var totalCount = query.Count();
+
+            var products = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var productsDTO = _mapper.Map<IEnumerable<ProductListDTO>>(products);
+
+            return new PaginatedList<ProductListDTO>() 
+            { 
+            
+                Items = productsDTO,
+                CurrentPage = page,
+                PageSize = pageSize,
+                TotalCount = totalCount,
+                TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize)
+
+            };
         } // done
 
         public async Task<IEnumerable<SelectListItem>> GetCategoriesAsync()
@@ -176,7 +192,11 @@ namespace myShop.BLL.Services.Classes
                 
         } // done
 
+        public async Task<IEnumerable<ProductListDTO>> GetAllAsync()
+        {
+            var products =   _unitOfWork.ProductRepository.GetAllWithLoadedData();
+            return _mapper.Map<IEnumerable<ProductListDTO>>(products);
 
-
+        }
     }
 }
